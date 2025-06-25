@@ -70,7 +70,8 @@ class OperationFactory:
         """
         Decorator for Operation subclass registration
 
-        Adds an Operation class to the _operations dict under its class name
+        Adds an Operation class to the _operations dict under its class name,
+        as well as any names in the classes _aliases list, if it has one.
 
         Parameters
         ----------
@@ -85,6 +86,9 @@ class OperationFactory:
         if not issubclass(op_cls, Operation):
             raise TypeError("Registered class must inherit from Operation")
         cls._operations[op_cls.__name__.lower()] = op_cls
+        if hasattr(op_cls, "_aliases"):
+            for alias in op_cls._aliases:
+                cls._operations[alias] = op_cls
         return op_cls
 
     @classmethod
@@ -115,6 +119,7 @@ class OperationFactory:
 @OperationFactory.register
 class Addition(Operation):
     """Concrete Product for addition operations"""
+    _aliases = ['add', '+']
 
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
@@ -137,6 +142,7 @@ class Addition(Operation):
 @OperationFactory.register
 class Subtraction(Operation):
     """Concrete Product for subtraction operations"""
+    _aliases = ['subtract', '-']
 
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
@@ -159,7 +165,7 @@ class Subtraction(Operation):
 @OperationFactory.register
 class Multiplication(Operation):
     """Concrete Product for multiplication operations"""
-
+    _aliases = ['multiply', '*']
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
         Multiplies two Decimal operands
@@ -181,6 +187,7 @@ class Multiplication(Operation):
 @OperationFactory.register
 class Division(Operation):
     """Concrete Product for division operations"""
+    _aliases = ['divide', '/']
 
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
@@ -224,6 +231,7 @@ class Division(Operation):
 @OperationFactory.register
 class Power(Operation):
     """Concrete Product for exponent operations"""
+    _aliases = ['^']
 
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
@@ -297,7 +305,153 @@ class Root(Operation):
         if y == 0:
             raise ValidationError("Zero radicand is undefined")
 
+@OperationFactory.register
+class Modulus(Operation):
+    """Concrete Product for modulo operations"""
+    _aliases = ['mod', 'modulo', '%']
 
+    def execute(self, x: Decimal, y: Decimal) -> Decimal:
+        """
+        Performs a modulo division using two operands
+
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+        
+        Returns
+        -------
+        Decimal
+            The remainder produced by a division of x by y
+        """
+        return x % y
+
+    def validate_operands(self, x: Decimal, y: Decimal) -> None:
+        """
+        Prechecks for a zero divisor
+
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+
+        Raises
+        ------
+        ValidationError
+            If a zero divisor is detected
+        """
+        if y == 0:
+            raise ValidationError("Divisor operand cannot be 0")
+
+@OperationFactory.register
+class IntegerDivision(Operation):
+    """Concrete Product for integer division operations"""
+    _aliases = ['int_divide', '//']
+
+    def execute(self, x: Decimal, y: Decimal) -> Decimal:
+        """
+        Performs an integer division using two operands
+
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+
+        Returns
+        -------
+        Decimal
+            The quotient value x / y, rounded down to an integer value
+        """
+        return (x / y).quantize('1.0', rounding=ROUND_FLOOR)
+
+    def validate_operands(self, x: Decimal, y: Decimal) -> None:
+        """
+        Prechecks for a zero divisor
+
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+
+        Raises
+        ------
+        ValidationError
+            If a zero divisor is detected
+        """
+        if y == 0:
+            raise ValidationError("Divisor operand cannot be 0")
+        
+@OperationFactory.register
+class Percentage(Operation):
+    """Concrete Product for percentage operations"""
+
+    def execute(self, x: Decimal, y: Decimal) -> Decimal:
+        """
+        Constructs a percentage using two operands
+        
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+
+        Returns
+        -------
+        Decimal
+            The ratio of x to y, expressed as a percentage
+        """
+        return x / y * 100
+
+    def validate_operands(self, x: Decimal, y: Decimal) -> None:
+        """
+        Prechecks for a zero divisor
+
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+
+        Raises
+        ------
+        ValidationError
+            If a zero divisor is detected
+        """
+        if y == 0:
+            raise ValidationError("Divisor operand cannot be 0")
+
+@OperationFactory.register
+class Distance(Operation):
+    """Concrete Product for distance operations"""
+    _aliases = ['abs_diff']
+
+    def execute(self, x: Decimal, y: Decimal) -> Decimal:
+        """
+        Calculates the distance between two operands
+
+        Parameters
+        ----------
+        x: Decimal
+            Minuend operand
+        y: Decimal
+            Subtrahend operand
+
+        Returns
+        -------
+        Decimal
+            The absolute difference, or distance, between x and y
+        """
+        return abs(x - y)
 
 
 
