@@ -156,6 +156,81 @@ class TestRoot(BaseOperationTest):
             }
     }
 
+class TestModulus(BaseOperationTest):
+    """Defines the test suite for the Modulus Operation"""
+    operation_class = ops.Modulus
+    valid_test_cases = {
+            "trivial_mod": {"x": "2", "y": "3", "expected": "2"},
+            "positive_mod": {"x": "3", "y": "2", "expected": "1"},
+            "negative_dividend": {"x": "-3", "y": "2", "expected": "-1"},
+            "negative_divisor": {"x": "3", "y": "-2", "expected": "1"},
+            "negative_operands": {"x": "-3", "y": "-2", "expected": "-1"},
+            "zero dividend": {"x": "0", "y": "2", "expected": "0"},
+            "float_dividend": {"x": "3.5", "y": "2", "expected": "1.5"},
+            "float_divisor": {"x": "3", "y": "2.5", "expected": "0.5"}
+    }
+    invalid_test_cases = {
+            "zero_divisor": {
+                "x": "3",
+                "y": "0",
+                "error": exc.ValidationError,
+                "message": "Divisor operand cannot be 0"
+            }
+    }
+
+class Test_Int_Division(BaseOperationTest):
+    """Defines the test suite for the Integer Division Operation"""
+    operation_class = ops.IntegerDivision
+    valid_test_cases = {
+            "trivial_int_divide": {"x": "4", "y": "2", "expected": "2"},
+            "positive_int_divide": {"x": "5", "y": "2", "expected": "2"},
+            "negative_dividend_int_divide": {"x": "-5", "y": "2", "expected": "-2"},
+            "negative_divisor_int_divide": {"x": "5", "y": "-2", "expected": "-2"},
+            "negative_int_divide": {"x": "-5", "y": "-2", "expected": "2"},
+            "zero_divisor_int_divide": {"x": "0", "y": "2", "expected": "0"}
+    }
+    invalid_test_cases = {
+            "zero_divisor": {
+                "x": "3",
+                "y": "0",
+                "error": exc.ValidationError,
+                "message": "Divisor operand cannot be 0"
+    }
+}
+
+class TestPercentage(BaseOperationTest):
+    """Defines the test suite for the Percentage Operation"""
+    operation_class = ops.Percentage
+    valid_test_cases = {
+            "positive_percentage": {"x": "2", "y": "4", "expected": "50"},
+            "mixed_percentage_x": {"x": "-2", "y": "4", "expected": "-50"},
+            "mixed_percentage_y": {"x": "2", "y": "-4", "expected": "-50"},
+            "negative_percentage": {"x": "-2", "y": "-4", "expected": "50"},
+            "large_percentage": {"x": "4", "y": "2", "expected": "200"},
+            "zero_percentage": {"x": "0", "y": "2", "expected": "0"},
+            "float_percentage": {"x": "1", "y": "8", "expected": "12.5"},
+    }
+    invalid_test_cases = {
+            "zero_divisor": {
+                "x": "3",
+                "y": "0",
+                "error": exc.ValidationError,
+                "message": "Divisor operand cannot be 0"
+            }
+    }
+
+class TestDistance(BaseOperationTest):
+    """Defines the test suite for the Distance Operation"""
+    operation_class = ops.Distance
+    valid_test_cases = {
+            "positive_distance": {"x": "4", "y": "2", "expected": "2"},
+            "negative_distance": {"x": "2", "y": "4", "expected": "2"},
+            "compound_distance": {"x": "-2", "y": "4", "expected": "6"},
+            "zero_distance": {"x": "2", "y": "2", "expected": "0"},
+            "float_distance": {"x": "2", "y": "4.5", "expected": "2.5"},
+    }
+    invalid_test_cases = {}
+
 class TestOperationFactory:
     """Defines the test suite for the OperationFactory class"""
 
@@ -163,11 +238,30 @@ class TestOperationFactory:
         """Tests valid calls to create_operation"""
         operation_map = {
                 'Addition': ops.Addition,
+                'add': ops.Addition,
+                '+': ops.Addition,
                 'Subtraction': ops.Subtraction,
+                'subtract': ops.Subtraction,
+                '-': ops.Subtraction,
                 'Multiplication': ops.Multiplication,
+                'multiply': ops.Multiplication,
+                '*': ops.Multiplication,
                 'Division': ops.Division,
+                'divide': ops.Division,
+                '/': ops.Division,
                 'Power': ops.Power,
+                '^': ops.Power,
                 'Root': ops.Root,
+                'Modulus': ops.Modulus,
+                'mod': ops.Modulus,
+                'modulo': ops.Modulus,
+                '%': ops.Modulus,
+                'IntegerDivision': ops.IntegerDivision,
+                'int_divide': ops.IntegerDivision,
+                '//': ops.IntegerDivision,
+                'Percentage': ops.Percentage,
+                'Distance': ops.Distance,
+                'abs_diff': ops.Distance
         }
         
         for op_name, op_class in operation_map.items():

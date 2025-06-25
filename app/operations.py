@@ -1,7 +1,7 @@
 """This module provides a class structure for composing and executing arithmetic operations"""
 
 from abc import ABC, abstractmethod
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from typing import Dict
 
 from app.exceptions import ValidationError
@@ -326,6 +326,7 @@ class Modulus(Operation):
         Decimal
             The remainder produced by a division of x by y
         """
+        self.validate_operands(x, y)
         return x % y
 
     def validate_operands(self, x: Decimal, y: Decimal) -> None:
@@ -368,7 +369,8 @@ class IntegerDivision(Operation):
         Decimal
             The quotient value x / y, rounded down to an integer value
         """
-        return (x / y).quantize('1.0', rounding=ROUND_FLOOR)
+        self.validate_operands(x, y)
+        return (x / y).quantize(Decimal('1'), rounding=ROUND_DOWN)
 
     def validate_operands(self, x: Decimal, y: Decimal) -> None:
         """
@@ -409,6 +411,7 @@ class Percentage(Operation):
         Decimal
             The ratio of x to y, expressed as a percentage
         """
+        self.validate_operands(x, y)
         return x / y * 100
 
     def validate_operands(self, x: Decimal, y: Decimal) -> None:
