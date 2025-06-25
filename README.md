@@ -1,7 +1,7 @@
-## SU25 IS601-850 Module 5: Advanced Design Patterns
-![Coverage Badge](https://github.com/lcphutchinson/is601_5/actions/workflows/ci.yml/badge.svg)
+## SU25 IS601-850 Midterm: Advanced REPL Calculator
+![Coverage Badge](https://github.com/lcphutchinson/is601_mid/actions/workflows/ci.yml/badge.svg)
 
-A module of Web Systems Development, by Keith Williams
+Developed for Web Systems Development, by Keith Williams
 
 <details>
 <summary>
