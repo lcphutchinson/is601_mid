@@ -162,12 +162,12 @@ class TestOperationFactory:
     def test_valid_create(self):
         """Tests valid calls to create_operation"""
         operation_map = {
-                'add': ops.Addition,
-                'subtract': ops.Subtraction,
-                'multiply': ops.Multiplication,
-                'divide': ops.Division,
-                'power': ops.Power,
-                'root': ops.Root,
+                'Addition': ops.Addition,
+                'Subtraction': ops.Subtraction,
+                'Multiplication': ops.Multiplication,
+                'Division': ops.Division,
+                'Power': ops.Power,
+                'Root': ops.Root,
         }
         
         for op_name, op_class in operation_map.items():
@@ -185,8 +185,8 @@ class TestOperationFactory:
             def execute(self, x: Decimal, y: Decimal) -> Decimal:
                 return x
 
-        ops.OperationFactory.register_operation("test_op", TestOperation)
-        operation = ops.OperationFactory.create_operation("test_op")
+        ops.OperationFactory.register(TestOperation)
+        operation = ops.OperationFactory.create_operation(TestOperation.__name__)
         assert isinstance(operation, TestOperation)
 
     def test_invalid_register(self):
@@ -195,6 +195,6 @@ class TestOperationFactory:
             pass
 
         with pytest.raises(TypeError, match="Registered class must inherit from Operation"):
-            ops.OperationFactory.register_operation("invalid", InvalidOperation)
+            ops.OperationFactory.register(InvalidOperation)
 
 

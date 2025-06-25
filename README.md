@@ -1,7 +1,9 @@
-## SU25 IS601-850 Midterm: Advanced REPL Calculator
+## SU25 IS601-850 Midterm: REPL Calculator w/Design Patterns
 ![Coverage Badge](https://github.com/lcphutchinson/is601_mid/actions/workflows/ci.yml/badge.svg)
 
-Developed for Web Systems Development, by Keith Williams
+Created for Web Systems Development, a course by Prof. Keith Williams of NJIT
+
+This project builds upon a basic application premise (the arithmetic calculator) to demonstrate various modern programming techniques such as automated testing, logging, and a number of Object-Oriented Design Patterns--specifically the Strategy, Factory, Observer, Memento, and Facade patterns. 
 
 <details>
 <summary>

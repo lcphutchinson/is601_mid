@@ -60,6 +60,59 @@ class Operation(ABC):
         """
         return self.__class__.__name__
 
+class OperationFactory:
+    """Factory class for the Operation class family"""
+
+    _operations: Dict[str, type] = {}
+
+    @classmethod
+    def register(cls, op_cls: type) -> None:
+        """
+        Decorator for Operation subclass registration
+
+        Adds an Operation class to the _operations dict under its class name
+
+        Parameters
+        ----------
+        op_cls: type
+            The Operation class to register
+
+        Raises
+        ------
+        TypeError
+            If a class outside the Operation family is registered
+        """
+        if not issubclass(op_cls, Operation):
+            raise TypeError("Registered class must inherit from Operation")
+        cls._operations[op_cls.__name__.lower()] = op_cls
+        return op_cls
+
+    @classmethod
+    def create_operation(cls, operation_type: str) -> Operation:
+        """
+        Instantiates an Operations subclass by string identifier.
+
+        Parameters
+        ----------
+        operation_type : str
+            a string identifier for the desired Operation
+
+        Raises
+        ------
+        ValueError
+            If the provided operation_type is not registered to the Factory
+
+        Returns
+        -------
+        Operation
+            an instance of the specified Operation subclass
+        """
+        operation_class = cls._operations.get(operation_type.lower())
+        if not operation_class:
+            raise ValueError(f"Unknown operation: {operation_type}")
+        return operation_class()
+
+@OperationFactory.register
 class Addition(Operation):
     """Concrete Product for addition operations"""
 
@@ -81,6 +134,7 @@ class Addition(Operation):
         """
         return x + y
 
+@OperationFactory.register
 class Subtraction(Operation):
     """Concrete Product for subtraction operations"""
 
@@ -102,6 +156,7 @@ class Subtraction(Operation):
         """
         return x - y
 
+@OperationFactory.register
 class Multiplication(Operation):
     """Concrete Product for multiplication operations"""
 
@@ -123,6 +178,7 @@ class Multiplication(Operation):
         """
         return x * y
 
+@OperationFactory.register
 class Division(Operation):
     """Concrete Product for division operations"""
 
@@ -165,6 +221,7 @@ class Division(Operation):
         if y == 0:
             raise ValidationError("Divisor operand cannot be 0")
 
+@OperationFactory.register
 class Power(Operation):
     """Concrete Product for exponent operations"""
 
@@ -190,6 +247,7 @@ class Power(Operation):
             return Decimal(1 / pow(float(x), float(y * -1)))
         return Decimal(pow(float(x), float(y)))
 
+@OperationFactory.register
 class Root(Operation):
     """Concrete Product for root operations"""
 
@@ -239,66 +297,86 @@ class Root(Operation):
         if y == 0:
             raise ValidationError("Zero radicand is undefined")
 
-class OperationFactory:
-    """Factory class for the Operation class family"""
 
-    _operations: Dict[str, type] = {
-            'add': Addition,
-            'addition': Addition,
-            'subtract': Subtraction,
-            'subtraction': Subtraction,
-            'multiply': Multiplication,
-            'multiplication': Multiplication,
-            'divide': Division,
-            'division': Division,
-            'power': Power,
-            'root': Root,
-    }
 
-    @classmethod
-    def register_operation(cls, name: str, operation_class: type) -> None:
-        """
-        Registers an operation class to the Factory
 
-        Parameters
-        ----------
-        name : str
-            text identifier for the operation
-        operation_class : type
-            class implementation of the operation
 
-        Raises
-        ------
-        TypeError
-            If a class outside the Operation family is registered
-        """
-        if not issubclass(operation_class, Operation):
-            raise TypeError("Registered class must inherit from Operation")
-        cls._operations[name.lower()] = operation_class
 
-    @classmethod
-    def create_operation(cls, operation_type: str) -> Operation:
-        """
-        Instantiates an Operations subclass by string identifier.
 
-        Parameters
-        ----------
-        operation_type : str
-            a string identifier for the desired Operation
 
-        Raises
-        ------
-        ValueError
-            If the provided operation_type is not registered to the Factory
 
-        Returns
-        -------
-        Operation
-            an instance of the specified Operation subclass
-        """
-        operation_class = cls._operations.get(operation_type.lower())
-        if not operation_class:
-            raise ValueError(f"Unknown operation: {operation_type}")
-        return operation_class()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
