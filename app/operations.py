@@ -1,7 +1,7 @@
 """This module provides a class structure for composing and executing arithmetic operations"""
 
 from abc import ABC, abstractmethod
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from typing import Dict
 
 from app.exceptions import ValidationError
@@ -60,8 +60,66 @@ class Operation(ABC):
         """
         return self.__class__.__name__
 
+class OperationFactory:
+    """Factory class for the Operation class family"""
+
+    _operations: Dict[str, type] = {}
+
+    @classmethod
+    def register(cls, op_cls: type) -> None:
+        """
+        Decorator for Operation subclass registration
+
+        Adds an Operation class to the _operations dict under its class name,
+        as well as any names in the classes _aliases list, if it has one.
+
+        Parameters
+        ----------
+        op_cls: type
+            The Operation class to register
+
+        Raises
+        ------
+        TypeError
+            If a class outside the Operation family is registered
+        """
+        if not issubclass(op_cls, Operation):
+            raise TypeError("Registered class must inherit from Operation")
+        cls._operations[op_cls.__name__.lower()] = op_cls
+        if hasattr(op_cls, "_aliases"):
+            for alias in op_cls._aliases:
+                cls._operations[alias] = op_cls
+        return op_cls
+
+    @classmethod
+    def create_operation(cls, operation_type: str) -> Operation:
+        """
+        Instantiates an Operations subclass by string identifier.
+
+        Parameters
+        ----------
+        operation_type : str
+            a string identifier for the desired Operation
+
+        Raises
+        ------
+        ValueError
+            If the provided operation_type is not registered to the Factory
+
+        Returns
+        -------
+        Operation
+            an instance of the specified Operation subclass
+        """
+        operation_class = cls._operations.get(operation_type.lower())
+        if not operation_class:
+            raise ValueError(f"Unknown operation: {operation_type}")
+        return operation_class()
+
+@OperationFactory.register
 class Addition(Operation):
     """Concrete Product for addition operations"""
+    _aliases = ['add', '+']
 
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
@@ -81,8 +139,10 @@ class Addition(Operation):
         """
         return x + y
 
+@OperationFactory.register
 class Subtraction(Operation):
     """Concrete Product for subtraction operations"""
+    _aliases = ['subtract', '-']
 
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
@@ -102,9 +162,10 @@ class Subtraction(Operation):
         """
         return x - y
 
+@OperationFactory.register
 class Multiplication(Operation):
     """Concrete Product for multiplication operations"""
-
+    _aliases = ['multiply', '*']
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
         Multiplies two Decimal operands
@@ -123,8 +184,10 @@ class Multiplication(Operation):
         """
         return x * y
 
+@OperationFactory.register
 class Division(Operation):
     """Concrete Product for division operations"""
+    _aliases = ['divide', '/']
 
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
@@ -165,8 +228,10 @@ class Division(Operation):
         if y == 0:
             raise ValidationError("Divisor operand cannot be 0")
 
+@OperationFactory.register
 class Power(Operation):
     """Concrete Product for exponent operations"""
+    _aliases = ['^']
 
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
@@ -190,6 +255,7 @@ class Power(Operation):
             return Decimal(1 / pow(float(x), float(y * -1)))
         return Decimal(pow(float(x), float(y)))
 
+@OperationFactory.register
 class Root(Operation):
     """Concrete Product for root operations"""
 
@@ -239,66 +305,235 @@ class Root(Operation):
         if y == 0:
             raise ValidationError("Zero radicand is undefined")
 
-class OperationFactory:
-    """Factory class for the Operation class family"""
+@OperationFactory.register
+class Modulus(Operation):
+    """Concrete Product for modulo operations"""
+    _aliases = ['mod', 'modulo', '%']
 
-    _operations: Dict[str, type] = {
-            'add': Addition,
-            'addition': Addition,
-            'subtract': Subtraction,
-            'subtraction': Subtraction,
-            'multiply': Multiplication,
-            'multiplication': Multiplication,
-            'divide': Division,
-            'division': Division,
-            'power': Power,
-            'root': Root,
-    }
-
-    @classmethod
-    def register_operation(cls, name: str, operation_class: type) -> None:
+    def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
-        Registers an operation class to the Factory
+        Performs a modulo division using two operands
 
         Parameters
         ----------
-        name : str
-            text identifier for the operation
-        operation_class : type
-            class implementation of the operation
-
-        Raises
-        ------
-        TypeError
-            If a class outside the Operation family is registered
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+        
+        Returns
+        -------
+        Decimal
+            The remainder produced by a division of x by y
         """
-        if not issubclass(operation_class, Operation):
-            raise TypeError("Registered class must inherit from Operation")
-        cls._operations[name.lower()] = operation_class
+        self.validate_operands(x, y)
+        return x % y
 
-    @classmethod
-    def create_operation(cls, operation_type: str) -> Operation:
+    def validate_operands(self, x: Decimal, y: Decimal) -> None:
         """
-        Instantiates an Operations subclass by string identifier.
+        Prechecks for a zero divisor
 
         Parameters
         ----------
-        operation_type : str
-            a string identifier for the desired Operation
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
 
         Raises
         ------
-        ValueError
-            If the provided operation_type is not registered to the Factory
+        ValidationError
+            If a zero divisor is detected
+        """
+        if y == 0:
+            raise ValidationError("Divisor operand cannot be 0")
+
+@OperationFactory.register
+class IntegerDivision(Operation):
+    """Concrete Product for integer division operations"""
+    _aliases = ['int_divide', '//']
+
+    def execute(self, x: Decimal, y: Decimal) -> Decimal:
+        """
+        Performs an integer division using two operands
+
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
 
         Returns
         -------
-        Operation
-            an instance of the specified Operation subclass
+        Decimal
+            The quotient value x / y, rounded down to an integer value
         """
-        operation_class = cls._operations.get(operation_type.lower())
-        if not operation_class:
-            raise ValueError(f"Unknown operation: {operation_type}")
-        return operation_class()
+        self.validate_operands(x, y)
+        return (x / y).quantize(Decimal('1'), rounding=ROUND_DOWN)
+
+    def validate_operands(self, x: Decimal, y: Decimal) -> None:
+        """
+        Prechecks for a zero divisor
+
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+
+        Raises
+        ------
+        ValidationError
+            If a zero divisor is detected
+        """
+        if y == 0:
+            raise ValidationError("Divisor operand cannot be 0")
+        
+@OperationFactory.register
+class Percentage(Operation):
+    """Concrete Product for percentage operations"""
+
+    def execute(self, x: Decimal, y: Decimal) -> Decimal:
+        """
+        Constructs a percentage using two operands
+        
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+
+        Returns
+        -------
+        Decimal
+            The ratio of x to y, expressed as a percentage
+        """
+        self.validate_operands(x, y)
+        return x / y * 100
+
+    def validate_operands(self, x: Decimal, y: Decimal) -> None:
+        """
+        Prechecks for a zero divisor
+
+        Parameters
+        ----------
+        x: Decimal
+            Dividend operand
+        y: Decimal
+            Divisor operand
+
+        Raises
+        ------
+        ValidationError
+            If a zero divisor is detected
+        """
+        if y == 0:
+            raise ValidationError("Divisor operand cannot be 0")
+
+@OperationFactory.register
+class Distance(Operation):
+    """Concrete Product for distance operations"""
+    _aliases = ['abs_diff']
+
+    def execute(self, x: Decimal, y: Decimal) -> Decimal:
+        """
+        Calculates the distance between two operands
+
+        Parameters
+        ----------
+        x: Decimal
+            Minuend operand
+        y: Decimal
+            Subtrahend operand
+
+        Returns
+        -------
+        Decimal
+            The absolute difference, or distance, between x and y
+        """
+        return abs(x - y)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
