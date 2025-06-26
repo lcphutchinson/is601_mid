@@ -19,7 +19,7 @@ class CalculatorConfig:
     _instance: 'CalculatorConfig' = None
 
     @classmethod
-    def __new__(cls, *args) -> 'CalculatorConfig':
+    def __new__(cls, *args, **kwargs) -> 'CalculatorConfig':
         """
         Class-level Singleton instantiation
 
@@ -72,17 +72,17 @@ class CalculatorConfig:
             os.getenv('CALCULATOR_MAX_HISTORY_SIZE', '1000'))
 
         auto_save_env = os.getenv('CALCULATOR_AUTO_SAVE', 'true').lower()
-        self.auto_save = auto_save if auto_save else \
-            auto_save_env == '1' or auto_save_env == 'true'
+        self.auto_save = auto_save or \
+            (auto_save_env == '1' or auto_save_env == 'true')
 
-        self.precision = precision or int(os.getenv(
-            'CALCULATOR_PRECISION', '10'))
+        self.precision = precision or \
+            int(os.getenv('CALCULATOR_PRECISION', '10'))
 
-        self.max_input_value = max_input_value or Decimal(
-            os.getenv('CALCULATOR_MAX_INPUT_VALUE', '1e999'))
+        self.max_input_value = max_input_value or \
+            Decimal(os.getenv('CALCULATOR_MAX_INPUT_VALUE', '1e999'))
 
-        self.default_encoding = default_encoding or os.getenv(
-            'CALCULATOR_DEFAULT_ENCODING', 'utf-8').lower()
+        self.default_encoding = default_encoding or \
+            os.getenv('CALCULATOR_DEFAULT_ENCODING', 'utf-8').lower()
 
     @property
     def log_dir(self) -> Path:
