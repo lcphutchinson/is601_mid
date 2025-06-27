@@ -45,6 +45,7 @@ class Calculator:
 
         self.undo_stack: List[CalculatorMemento] = []
         self.redo_stack: List[CalculatorMemento] = []
+        self.total: Decimal = Decimal(0)
 
         self._setup_directories()
 
@@ -166,6 +167,7 @@ class Calculator:
             )
             self.undo_stack.append(CalculatorMemento(self.history.copy()))
             self.redo_stack.clear()
+            self.total = result
             self.history.append(calc)
             self.notify_observers(calc)
             
@@ -236,6 +238,8 @@ class Calculator:
                         })
                         for _, row in df.iterrows()
                     ]
+                    if self.history:
+                        self.total = self.history[-1].result
                     log.info(f"Loaded {len(self.history)} calculations from history")
                 else:
                     log.info(f"No history loaded: file empty")
@@ -273,11 +277,12 @@ class Calculator:
         self.history.clear()
         self.undo_stack.clear()
         self.redo_stack.clear()
+        self.total = Decimal('0')
         log.info("History Cleared")
 
     def undo(self) -> bool:
         """
-        Undoes one Operation
+       Undoes one Operation
 
         Returns
         -------
@@ -289,6 +294,8 @@ class Calculator:
         memento = self.undo_stack.pop()
         self.redo_stack.append(CalculatorMemento(self.history.copy()))
         self.history = memento.history.copy()
+        if self.history:
+            self.total = self.history[-1].result
         return True
 
     def redo(self) -> bool:
@@ -305,10 +312,9 @@ class Calculator:
         memento = self.redo_stack.pop()
         self.undo_stack.append(CalculatorMemento(self.history.copy()))
         self.history = memento.history.copy()
+        if self.history:
+            self.total = self.history[-1].result
         return True
-
-
-
 
 
 
