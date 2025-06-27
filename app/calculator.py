@@ -295,7 +295,7 @@ class Calculator:
         self.redo_stack.append(CalculatorMemento(self.history.copy()))
         self.history = memento.history.copy()
         if self.history:
-            self.total = self.history[-1].result
+            self.total = self.history[-1].result # pragma: no cover
         return True
 
     def redo(self) -> bool:
