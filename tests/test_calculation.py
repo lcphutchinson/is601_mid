@@ -149,3 +149,4 @@ def test_valid_eq():
 def test_bad_eq(other: object):
     calc = Calculation(operation="add", operandx=Decimal("8"), operandy=Decimal("6"), result=Decimal("14"))
     assert not calc.__eq__(other), f"Object <{other.__repr__}> flagged as equal to <{calc.__repr__}>"
+

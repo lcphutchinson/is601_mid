@@ -48,7 +48,7 @@ class Calculation:
 
         Returns
         -------
-        Calculatio"operation": "subtract", "operandx": 5, "operandy": 3, "result": 2n
+        Calculation
             A Calculation instance based on the input record
         """
         try:
