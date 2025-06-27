@@ -64,15 +64,20 @@ class OperationFactory:
     """Factory class for the Operation class family"""
 
     _operations: Dict[str, type] = {}
-    _op_menu: str = "\nAvailable Commands\n------------------\n"
+    op_menu: str = ( "\nArithmetic Commands\n"
+                    "-------------------\n"
+                    "<command> [<alias>]: <description>\n"
+                    "----------------------------------\n"
+    )
 
     @classmethod
-    def register(cls, op_cls: type) -> None:
+    def register(cls, op_cls: type) -> type:
         """
         Decorator for Operation subclass registration
 
         Adds an Operation class to the _operations dict under its class name,
         as well as any names in the classes _aliases list, if it has one.
+        Also adds descriptive text to the Factory's menu text, used in the help command.
 
         Parameters
         ----------
@@ -92,8 +97,8 @@ class OperationFactory:
             alias_tag = f"{op_cls._aliases}"
             for alias in op_cls._aliases:
                 cls._operations[alias] = op_cls
-        if hasattr(op_cls, "__doc__"):
-            cls._op_menu += (
+        if hasattr(op_cls.execute, "__doc__"):
+            cls.op_menu += (
                 f"{op_cls.__name__} "
                 f"{alias_tag}: "
                 f"{op_cls.execute.__doc__.strip().partition('\n')[0]}\n" 

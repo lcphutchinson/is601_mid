@@ -14,7 +14,7 @@ class TestBaseOperation:
         class TestOperation(ops.Operation):
             def execute(self, x: Decimal, y: Decimal) -> Decimal:
                 return x
-
+        
         assert str(TestOperation()) == "TestOperation"
 
 class BaseOperationTest:
@@ -277,11 +277,13 @@ class TestOperationFactory:
         """Test valid registration parameters"""
         class TestOperation(ops.Operation):
             def execute(self, x: Decimal, y: Decimal) -> Decimal:
+                """Test Doc"""
                 return x
 
         ops.OperationFactory.register(TestOperation)
         operation = ops.OperationFactory.create_operation(TestOperation.__name__)
         assert isinstance(operation, TestOperation)
+        assert """TestOperation""" in ops.OperationFactory.op_menu
 
     def test_invalid_register(self):
         """Test invalid registration parameters"""

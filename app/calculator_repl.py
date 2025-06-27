@@ -8,6 +8,11 @@ from app.exceptions import OperationError, ValidationError
 from app.history import AutoSaveObserver, LoggingObserver
 from app.operations import OperationFactory
 
+class Calculator_REPL():
+    def __init__():
+        _commands : dict[str, Command] = {}
+        
+
 def calculator_repl():
     """Launches and maintains the REPL interface"""
     try:
@@ -117,4 +122,20 @@ def calculator_repl():
         log.error(f"Fatal error in REPL: {e}")
         raise
 
+def get_operands(command: str) -> (int, int):
+    try:
+        print(f"Enter operands for command '{command}' or '{cancel}' to abort:")
+        ------------------"x = input(">> operandx: ").lower().strip()
+        if x == 'cancel':
+            print(f"{command} cancelled")
+            raise InputError("Command cancelled")
+        y = input(">> operandy: ").lower().strip()
+        if y == 'cancel':
+            print(f"{command} cancelled")
+            raise InputError("Command cancelled")
+        return (x, y)
+    except KeyboardInterrupt:
+        raise InputError("Keyboard Interrupt (Ctrl+C) detected. Command cancelled")
+    except Exception as e:
+        raise InputError("An Unexpected Error occurred. Command cancelled")
 
