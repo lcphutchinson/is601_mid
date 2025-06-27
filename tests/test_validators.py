@@ -64,9 +64,9 @@ def test_valid_inputs(value: Any, expected: Decimal):
 ])
 def test_bad_inputs(value: Any, expected: str):
     """Tests error handling for invalid inputs in validate_number"""
-    os.environ['CALCULATOR_MAX_INPUT_VALUE'] = '1000'
+    CalculatorConfig(max_input_value=1000)
     with pytest.raises(ValidationError, match=expected):
         InputValidator.validate_number(value)
-    os.environ.pop('CALCULATOR_MAX_INPUT_VALUE')
     CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
 

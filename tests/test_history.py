@@ -8,6 +8,8 @@ from app.history import LoggingObserver, AutoSaveObserver
 from app.calculator import Calculator
 from app.calculator_config import CalculatorConfig
 
+CalculatorConfig._is_configured = False
+
 calculation_mock = Mock(spec=Calculation)
 calculation_mock.operation = "addition"
 calculation_mock.operandx = 8
@@ -17,6 +19,7 @@ calculation_mock.result = 14
 calculator_mock = Mock(spec=Calculator)
 calculator_mock.config = Mock(spec=CalculatorConfig)
 calculator_mock.config.auto_save = True
+calculator_mock.config.precision = 10
 
 @patch('logging.info')
 def test_logging_observer_log(logging_info_mock):
@@ -66,5 +69,4 @@ def test_autosave_observer_no_config():
     """Tests AutoSaveObserver's error handling of an invalid config"""
     with pytest.raises(TypeError):
         AutoSaveObserver(None)
-
 

@@ -9,7 +9,6 @@ from unittest.mock import Mock, patch, PropertyMock
 from tempfile import TemporaryDirectory
 
 from app.calculator import Calculator
-from app.calculator_repl import calculator_repl
 from app.calculator_config import CalculatorConfig
 from app.exceptions import OperationError, ValidationError
 from app.history import LoggingObserver, AutoSaveObserver
@@ -17,6 +16,7 @@ from app.operations import OperationFactory
 
 @pytest.fixture
 def calculator():
+    CalculatorConfig._is_configured = False
     with TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
         config = CalculatorConfig(base_dir=temp_path)
@@ -35,8 +35,10 @@ def calculator():
             mock_history_dir.return_value = temp_path / "history"
             mock_history_file.return_value = temp_path / "history/calculator_history.csv"
 
-            yield Calculator(config=config)
-        
+            calculator = Calculator()
+            calculator.config = config
+            yield calculator
+
 def test_calculator_init(calculator):
     assert calculator.history == []
     assert calculator.undo_stack == []
@@ -50,7 +52,7 @@ def test_logging_setup(logging_info_mock):
         patch.object(CalculatorConfig, 'log_file', \
         new_callable=PropertyMock) as mock_log_file:
 
-        calculator = Calculator(CalculatorConfig())
+        calculator = Calculator()
         logging_info_mock.assert_any_call("Calculator configured successfully")
 
 def test_add_observer(calculator):
@@ -77,11 +79,13 @@ def test_perform_operation(calculator):
 
 def test_overflow_history(calculator):
     calculator.config.max_history_size = 1
+    assert calculator.config.max_history_size == 1, "Basic Language Functionality not working."
     operation = OperationFactory.create_operation('add')
     calculator.set_operation(operation)
     calculator.perform_operation(8, 6)
     calculator.perform_operation(8, 6)
     assert len(calculator.history) == 1
+    calculator.config.max_history_size = 1000
 
 def test_perform_operation_validation_error(calculator):
     calculator.set_operation(OperationFactory.create_operation('add'))

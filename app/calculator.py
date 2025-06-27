@@ -22,7 +22,7 @@ CalculationResult = Union[Number, str]
 
 class Calculator:
     """Central business layer class for delivering features"""
-    def __init__(self, config: Optional[CalculatorConfig] = None) -> None:
+    def __init__(self) -> None:
         """
         Initializes and configures the calculator
 
@@ -32,7 +32,7 @@ class Calculator:
             Configuration settings for the application. Loaded from .env if not paased
         """
 
-        self.config = config if config is not None else CalculatorConfig()
+        self.config = CalculatorConfig()
         self.config.validate()
         
         os.makedirs(self.config.log_dir, exist_ok=True)
@@ -151,8 +151,8 @@ class Calculator:
 
         try:
             # Validate
-            valid_x = InputValidator.validate_number(x, self.config)
-            valid_y = InputValidator.validate_number(y, self.config)
+            valid_x = InputValidator.validate_number(x)
+            valid_y = InputValidator.validate_number(y)
 
             # Execute
             result = self.operation_strategy.execute(valid_x, valid_y)
