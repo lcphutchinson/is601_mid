@@ -16,7 +16,7 @@ class Operation(ABC):
     @abstractmethod
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
-        Perform's the class's underlying arithmetic on its stored operands.
+        Performs the class's underlying arithmetic on its stored operands.
 
         Must be implemented by child classes.
 
@@ -64,6 +64,7 @@ class OperationFactory:
     """Factory class for the Operation class family"""
 
     _operations: Dict[str, type] = {}
+    _op_menu: str = "\nAvailable Commands\n------------------\n"
 
     @classmethod
     def register(cls, op_cls: type) -> None:
@@ -86,9 +87,17 @@ class OperationFactory:
         if not issubclass(op_cls, Operation):
             raise TypeError("Registered class must inherit from Operation")
         cls._operations[op_cls.__name__.lower()] = op_cls
+        alias_tag = '[]'
         if hasattr(op_cls, "_aliases"):
+            alias_tag = f"{op_cls._aliases}"
             for alias in op_cls._aliases:
                 cls._operations[alias] = op_cls
+        if hasattr(op_cls, "__doc__"):
+            cls._op_menu += (
+                f"{op_cls.__name__} "
+                f"{alias_tag}: "
+                f"{op_cls.execute.__doc__.strip().partition('\n')[0]}\n" 
+                )
         return op_cls
 
     @classmethod
@@ -166,6 +175,7 @@ class Subtraction(Operation):
 class Multiplication(Operation):
     """Concrete Product for multiplication operations"""
     _aliases = ['multiply', '*']
+
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
         Multiplies two Decimal operands
