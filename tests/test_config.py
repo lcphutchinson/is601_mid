@@ -10,23 +10,15 @@ from app.exceptions import ConfigurationError
 
 # Clear any existing Singleton
 CalculatorConfig._instance = None
-
-os.environ['CALCULATOR_MAX_HISTORY_SIZE'] = '500'
-os.environ['CALCULATOR_AUTO_SAVE'] = 'false'
-os.environ['CALCULATOR_PRECISION'] = '8'
-os.environ['CALCULATOR_MAX_INPUT_VALUE'] = '1000'
-os.environ['CALCULATOR_DEFAULT_ENCODING'] = 'utf-16'
-os.environ['CALCULATOR_LOG_DIR'] = './test_logs'
-os.environ['CALCULATOR_HISTORY_DIR'] = './test_history'
-os.environ['CALCULATOR_HISTORY_FILE'] = './test_history/test_history.csv'
-os.environ['CALCULATOR_LOG_FILE'] = './test_log/test_log.log'
+CalculatorConfig._is_configured = False
 
 def test_singleton_configuration():
-    """Tests the singleton pattern against overwrite"""
+    """Tests the singleton pattern against reinitialization"""
     config = CalculatorConfig()
-    config_dup = CalculatorConfig()
+    config_dup = CalculatorConfig(precision=7)
     assert config_dup is config
     CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
 
 def test_sample_configurations():
     """Tests the proper assignment and accessibility of a full set of sample configurations"""
@@ -50,6 +42,7 @@ def test_sample_configurations():
     assert config.history_file == Path('./test_history/test_history.csv').resolve()
     assert config.log_file == Path('./test_log/test_log.log').resolve()
     CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
 
 def test_fallback_configurations():
     """Tests the proper initialization of configurations in the absence of environment variables"""
@@ -61,6 +54,33 @@ def test_fallback_configurations():
     assert config.max_input_value == Decimal('1e999')
     assert config.default_encoding == 'utf-8'
     CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
+
+def test_constructor_configuration():
+    """Tests the proper passing of arguments to the config object"""
+    config = CalculatorConfig(
+        base_dir = Path('./test_base').resolve(),
+        max_history_size = 7,
+        auto_save = False,
+        precision = 7,
+        default_encoding = 'utf-16'
+    )
+    assert config.base_dir == Path('./test_base').resolve()
+    assert config.max_history_size == 7
+    assert config.auto_save == False
+    assert config.precision == 7
+    assert config.default_encoding == 'utf-16'
+    CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
+
+def test_property_reassign():
+    """Tests modifying properties of the Singleton post-instantiation"""
+    config = CalculatorConfig()
+    assert config.precision == 10
+    config.precision = 7
+    assert config.precision == 7
+    CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
 
 def test_alternate_paths():
     os.environ['CALCULATOR_BASE_DIR'] = './test_base'
@@ -72,6 +92,7 @@ def test_alternate_paths():
     assert config.log_file == Path('./test_base/alt_log/alt_log.log').resolve()
     assert config.history_file == Path('./test_base/alt_history/alt_history.csv').resolve()
     CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
 
 @pytest.mark.parametrize(
         "val, expected",
@@ -94,6 +115,7 @@ def test_auto_save_vals(val: str, expected: bool):
     assert config.auto_save is expected,\
         f"Expected value {expected} from input {val}"
     CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
 
 @pytest.mark.parametrize(
         "var, expected",
@@ -115,5 +137,6 @@ def test_invalid_parameters(var: str, expected: str):
         config = CalculatorConfig()
         config.validate()
     CalculatorConfig._instance = None
+    CalculatorConfig._is_configured = False
     os.environ.pop(var)
 

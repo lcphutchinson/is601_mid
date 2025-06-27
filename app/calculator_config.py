@@ -17,6 +17,7 @@ class CalculatorConfig:
     Implements the Singleton Pattern
     """
     _instance: 'CalculatorConfig' = None
+    _is_configured: bool = False
 
     @classmethod
     def __new__(cls, *args, **kwargs) -> 'CalculatorConfig':
@@ -62,6 +63,9 @@ class CalculatorConfig:
         default_encoding: str
             Default encoding for file/IO Operations.
         """
+        if self._is_configured:
+            return
+
         load_dotenv()
         project_root = Path(__file__).parent.parent
         self.base_dir = base_dir or Path(os.getenv(
@@ -72,7 +76,7 @@ class CalculatorConfig:
             os.getenv('CALCULATOR_MAX_HISTORY_SIZE', '1000'))
 
         auto_save_env = os.getenv('CALCULATOR_AUTO_SAVE', 'true').lower()
-        self.auto_save = auto_save or \
+        self.auto_save = auto_save if auto_save is not None else \
             (auto_save_env == '1' or auto_save_env == 'true')
 
         self.precision = precision or \
@@ -84,6 +88,8 @@ class CalculatorConfig:
         self.default_encoding = default_encoding or \
             os.getenv('CALCULATOR_DEFAULT_ENCODING', 'utf-8').lower()
 
+        self._is_configured = True
+        
     @property
     def log_dir(self) -> Path:
         """

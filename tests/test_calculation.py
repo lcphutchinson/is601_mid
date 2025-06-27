@@ -6,8 +6,11 @@ from decimal import Decimal
 from datetime import datetime
 from typing import Dict, Any
 
+from app.calculator_config import CalculatorConfig
 from app.calculation import Calculation
 from app.exceptions import SerializationError
+
+CalculatorConfig._is_configured = False
 
 @pytest.mark.parametrize(
         "data, expected",
