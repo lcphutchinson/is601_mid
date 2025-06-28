@@ -87,7 +87,7 @@ class Calculator_REPL():
             raise 
         except KeyboardInterrupt: # pragma: no cover
             raise InputError("Keyboard Interrupt (Ctrl+C) detected. Command cancelled")
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             raise InputError("An Unexpected Error occurred. Command cancelled")
 
 
