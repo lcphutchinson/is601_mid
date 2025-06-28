@@ -9,7 +9,7 @@ from app.operations import OperationFactory
 
 class Command(ABC):
     """Abstract base class for the Command family of classes"""
-    _command_menu: str = f"Interface Commands\n------------------\n"
+    _command_menu: str = f"\nInterface Commands\n------------------\n"
 
     @abstractmethod
     def execute(self) -> str:
@@ -98,7 +98,7 @@ class ArithmeticCommand(Command):
             self._calc.set_operation(self._op)
             result = self._calc.perform_operation(self._x, self._y)
             return f"Result: {result}"
-        except (InputError, OperationError, ValidationError) as e:
+        except (InputError, OperationError, ValidationError, ValueError) as e:
             return f"Error: {str(e)}"
         except Exception as e:
             return f"Unexpected Error: {str(e)}"
@@ -186,7 +186,7 @@ class Help(Command):
         str
             An output message to be displayed to the user
         """
-        return command_menu + OperationFactory.op_menu
+        return self._command_menu + OperationFactory.op_menu
 
 @Command.help_menu_member
 class History(Command):
@@ -274,8 +274,8 @@ class Redo(Command):
             An output message to be displayed to the user
         """
         if self._calc.redo():
-            return "Undo successful"
-        return "Nothing to undo"
+            return "Redo successful"
+        return "Nothing to redo"
 
 @Command.help_menu_member
 class Save(Command):

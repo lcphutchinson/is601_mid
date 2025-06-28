@@ -270,7 +270,7 @@ class TestOperationFactory:
 
     def test_invalid_create(self):
         """Test invalid calls to create_operation"""
-        with pytest.raises(ValueError, match="Unknown operation: invalid_op"):
+        with pytest.raises(ValueError, match="Unknown operation: 'invalid_op'"):
             ops.OperationFactory.create_operation("invalid_op")
 
     def test_valid_register(self):

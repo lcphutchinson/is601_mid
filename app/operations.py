@@ -127,7 +127,7 @@ class OperationFactory:
         """
         operation_class = cls._operations.get(operation_type.lower())
         if not operation_class:
-            raise ValueError(f"Unknown operation: {operation_type}")
+            raise ValueError(f"Unknown operation: '{operation_type}'")
         return operation_class()
 
 @OperationFactory.register
