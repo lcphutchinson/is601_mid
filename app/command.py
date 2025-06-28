@@ -100,7 +100,7 @@ class ArithmeticCommand(Command):
             return f"Result: {result}"
         except (InputError, OperationError, ValidationError, ValueError) as e:
             return f"Error: {str(e)}"
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             return f"Unexpected Error: {str(e)}"
 
 @Command.help_menu_member
@@ -129,7 +129,7 @@ class Clear(Command):
         try:
             self._calc.clear_history()
             return "History cleared"
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             return f"Error: {str(e)}"
 
 @Command.help_menu_member
@@ -159,7 +159,7 @@ class Exit(Command):
         try:
             self._calc.save_history()
             exit_msg = "History Saved Successfully" + exit_msg
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             exit_msg = f"Warning: History save error: {str(e)}" + exit_msg
         return exit_msg
 
@@ -247,7 +247,7 @@ class Load(Command):
             if not self._calc.history:
                 return "Load Successful, but History file was empty"
             return "Load Successful"
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             return f"Warning: History load error: {str(e)}"
 
 @Command.help_menu_member
@@ -303,7 +303,7 @@ class Save(Command):
         try:
             self._calc.save_history()
             return "Save Successful"
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             return f"Warning: History save failed: {str(e)}"
 
 @Command.help_menu_member

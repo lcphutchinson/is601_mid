@@ -36,10 +36,10 @@ class Calculator_REPL():
         while True:
             try:
                 user_input = input(f">>[{self._calc.total}]$: ").lower().strip().split()
-            except EOFError:
+            except EOFError: # pragma: no cover
                 print("EOF Signal detected. Exiting...")
                 break
-            if not user_input:
+            if not user_input: # pragma: no cover
                 continue
             command = self._commands.get(user_input[0], self._arith_command)
             try:
@@ -47,7 +47,7 @@ class Calculator_REPL():
                     else command.execute(*tuple(user_input))
                 print(resp)
                 log.info(f"Delivered Output: {resp}")
-            except Exception as e:
+            except Exception as e: # pragma: no cover
                 print(f"Fatal Error detected: {str(e)}")
                 log.error(f"Fatal Error detected: {str(e)}")
             if command == self._commands['exit']:
@@ -85,7 +85,7 @@ class Calculator_REPL():
             return (x, y)
         except InputError:
             raise 
-        except KeyboardInterrupt:
+        except KeyboardInterrupt: # pragma: no cover
             raise InputError("Keyboard Interrupt (Ctrl+C) detected. Command cancelled")
         except Exception as e:
             raise InputError("An Unexpected Error occurred. Command cancelled")

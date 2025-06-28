@@ -79,3 +79,12 @@ def test_calculator_repl_cancel(mock_print, mock_input):
     mock_print.assert_any_call("Error: Unknown operation: 'nonsense'")
     mock_print.reset_mock()
     mock_input.reset_mock()
+
+@patch('builtins.input', side_effect=['8 + 6', '- 4', '2 * 2', '^ 2', 'exit'])
+@patch('builtins.print')
+def test_calculator_repl_alternate_input_modes(mock_print, mock_input):
+    Calculator_REPL().run()
+    mock_print.assert_any_call("Result: 14")
+    mock_print.assert_any_call("Result: 10")
+    mock_print.assert_any_call("Result: 4")
+    mock_print.assert_any_call("Result: 16")
