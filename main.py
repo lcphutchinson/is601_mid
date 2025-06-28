@@ -1,4 +1,4 @@
-from app.calculator_repl import calculator_repl
+from app.calculator_repl import Calculator_REPL
 
 if __name__ == "__main__":
-    calculator_repl()
+    Calculator_REPL().run()

@@ -282,7 +282,7 @@ class Calculator:
 
     def undo(self) -> bool:
         """
-       Undoes one Operation
+        Undoes one Operation
 
         Returns
         -------

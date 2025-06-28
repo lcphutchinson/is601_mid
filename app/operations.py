@@ -16,7 +16,7 @@ class Operation(ABC):
     @abstractmethod
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
-        Perform's the class's underlying arithmetic on its stored operands.
+        Performs the class's underlying arithmetic on its stored operands.
 
         Must be implemented by child classes.
 
@@ -64,14 +64,20 @@ class OperationFactory:
     """Factory class for the Operation class family"""
 
     _operations: Dict[str, type] = {}
+    op_menu: str = ( "\nArithmetic Commands\n"
+                    "-------------------\n"
+                    "<command> [<alias>]: <description>\n"
+                    "----------------------------------\n"
+    )
 
     @classmethod
-    def register(cls, op_cls: type) -> None:
+    def register(cls, op_cls: type) -> type:
         """
         Decorator for Operation subclass registration
 
         Adds an Operation class to the _operations dict under its class name,
         as well as any names in the classes _aliases list, if it has one.
+        Also adds descriptive text to the Factory's menu text, used in the help command.
 
         Parameters
         ----------
@@ -86,9 +92,17 @@ class OperationFactory:
         if not issubclass(op_cls, Operation):
             raise TypeError("Registered class must inherit from Operation")
         cls._operations[op_cls.__name__.lower()] = op_cls
+        alias_tag = '[]'
         if hasattr(op_cls, "_aliases"):
+            alias_tag = f"{op_cls._aliases}"
             for alias in op_cls._aliases:
                 cls._operations[alias] = op_cls
+        if hasattr(op_cls.execute, "__doc__"):
+            cls.op_menu += (
+                f"{op_cls.__name__} "
+                f"{alias_tag}: "
+                f"{op_cls.execute.__doc__.strip().partition('\n')[0]}\n" 
+                )
         return op_cls
 
     @classmethod
@@ -113,7 +127,7 @@ class OperationFactory:
         """
         operation_class = cls._operations.get(operation_type.lower())
         if not operation_class:
-            raise ValueError(f"Unknown operation: {operation_type}")
+            raise ValueError(f"Unknown operation: '{operation_type}'")
         return operation_class()
 
 @OperationFactory.register
@@ -166,6 +180,7 @@ class Subtraction(Operation):
 class Multiplication(Operation):
     """Concrete Product for multiplication operations"""
     _aliases = ['multiply', '*']
+
     def execute(self, x: Decimal, y: Decimal) -> Decimal:
         """
         Multiplies two Decimal operands
