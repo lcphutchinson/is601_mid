@@ -8,6 +8,9 @@ class ConfigurationError(CalculatorError):
     """Raised when encountering invalid configuration settings"""
     pass
 
+class InputError(CalculatorError):
+    """Raised when an UI operation cannot be completed"""
+
 class OperationError(CalculatorError):
     """Raised when a calculation is initiated but cannot be complete"""
     pass
