@@ -3,7 +3,11 @@
 
 Created for Web Systems Development, a course by Prof. Keith Williams of NJIT
 
-This project builds upon a basic application premise (the arithmetic calculator) to demonstrate various modern programming techniques such as automated testing, logging, and a number of Object-Oriented Design Patterns--specifically the Strategy, Factory, Observer, Memento, and Facade patterns. 
+This project builds upon a basic application premise (the arithmetic calculator) to demonstrate various modern programming techniques such as automated testing, logging, and a number of Object-Oriented Design Patterns--specifically the Command, Strategy, Factory, Observer, Memento, and Facade patterns. 
+
+### 📑 Project Description
+
+Python REPL Calculator (v.1.6) is a Python application for the bash shell environment that provides ten basic arithmetic operations over three input modes (Binary, Unary, and Guided), as well as a robust operation history with save, load, undo and redo functionalities. For full details, see 🚀 **Operation** below.
 
 <details>
 <summary>
@@ -206,6 +210,26 @@ pip install -r requirements.txt
 
 ---
 
+### 🔧 Customization
+
+Python REPL Calculator has a number of configuration settings that can be modified by adding a .env file to the root project folder 'is601_mid'
+
+Below are the example contents of an is601_mid/.env file:
+```bash
+CALCULATOR_BASE_DIR=. # Default parent directory for /logs and /history
+CALCULATOR_LOG_DIR=./logs # Default directory for log files
+CALCULATOR_HISTORY_DIR=./history # Default directory for saved history
+CALCULATOR_LOG_FILE=./logs/calculator_log.log # Logging filepath
+CALCULATOR_HISTORY_FILE=./history/calculator_history.csv # History filepath
+CALCULATOR_MAX_HISTORY_SIZE=1000 # Maximum number of saved calculations
+CALCULATOR_AUTO_SAVE=True # When True, performs a Save after each calculation
+CALCULATOR_PRECISION=10 # Sets the precision of decimal results
+CALCULATOR_MAX_INPUT_VALUE=1e999 # Sets the max value for operation inputs
+CALCULATOR_DEFAULT_ENCODING=utf-8 # Sets the default encoding
+```
+
+---
+
 ### 🚀 Operation
 
 Launch the calculator with Python:
@@ -214,108 +238,128 @@ Launch the calculator with Python:
 python3 main.py
 ```
 
-Module 3's Calculator supports six arithmetic operations
+**Arithmetic Operations**
+Version 1.6 supports ten arithetic operations:
 
 ```bash
-add: Adds two operands, x and y.
-subtract: Subtracts an operand y from another operand x.
-multiply: Multiplies two operands, x and y.
-divide: Divides a non-zero operand y from another operand x.
-power: Raises an operand x to the nth power, where n == operand y
-root: Produces the nth root of operand x, where n == operand y
+Addition ['add', '+']: Adds two Decimal operands
+Subtraction ['subtract', '-']: Performs a subtraction using two operands
+Multiplication ['multiply', '*']: Multiplies two Decimal operands
+Division ['divide', '/']: Performs a division using two operands
+Power ['^']: Performs an exponentiation using two operands
+Root []: Performs a root operation using two operands
+Modulus ['mod', 'modulo', '%']: Performs a modulo division using two operands
+IntegerDivision ['int_divide', '//']: Performs an integer division using two operands
+Percentage []: Constructs a percentage using two operands
+Distance ['abs_diff']: Calculates the distance between two operands
 ```
 
-New in v.1.5, Arithmetic operations are called without operands and will request operands in a followup dialogue.
- 
+Values in the bracketed tags on each operation name can be used as aliases or operand values to call the operation in question. For example, the commands 'add' and 'Addition' are both sufficient to launch an Addition operation.
+
+---
+
+Arithmetic Operations in version 1.6 can make use of three input modes:
+
+**Binary Inputs**
+Using an operation's operator (+. -. *, etc.,) you may launch an operation by entering it as you would in a traditional calculator:
+
 ```bash
->>$: add
-Enter operands for command 'add', or 'cancel' to abort:
->> operandx: 8
->> operandy: 6
-Result: 14
->>$:
+>>[0]$: 5 + 5
+Result: 10
+>>[10]$:
 ```
 
-All arithmetic commands can be cancelled during their operand input promps
+Note the result of a binary operation is stored in the total field to the left of the cursor.
+
+**Unary Inputs**
+When entering only an operator and a single operand, the second operand is inferred to be the running total, as in a traditional calculator:
 
 ```bash
->>$: subtract
-Enter operands for command 'subtract', or 'cancel' to abort:
->> operandx: cancel
-subtract cancelled
->>$:
+>>[10]$: ^ 2
+Result: 100
+>>[100]$:
 ```
 
-If a command is not parsable or otherwise invalid, an error message will be shown, but the program will not terminate:
+**Guided Inputs**
+When only a command is entered, the REPL Calculator will request each operand individually before performing the operation
 
 ```bash
->>$: nonsense
-Unknown command: 'nonsense'. Type 'help' for available commands.
->>$:
+>>[100]$: int_divide
+Enter operands for command 'int_divide' or 'cancel' to abort:
+>> operandx: 100
+>> operandy: 3
+Result: 33
+>>[33]$:
 ```
 
-New in v.1.4: Use the special command 'history' to display a log of operations from this session.
-```bash
->>$: history
-Calculation History
--------------------
-1. Addition(8, 6) = 14
->>$:
-```
+---
 
-To display a full command list use the special command 'help'
+**Interface Commands**
+
+Version 1.6 supports eight Interface Commands, which manage the calculator and its history in numerous ways.
+
 ```bash
->>$: help
-Available Commands
+Interface Commands
 ------------------
-add, subtract, multiply, divide, power, root -- Perform calculations
-history - Display your calculation history
-clear - Clear your calculation history
-undo - Undo your last calculation
-redo - Redo the last undone calculation
-save - Save calculation history to file
-load - Load calculation history from file
-exit - Exit the calculator
->>$:
+Clear: Clears the current operation history
+Exit: Saves the current history and exits the Calculator
+Help: Displays a list of available commands
+History: Displays the current calculator history
+Load: Loads a saved calculation history from file
+Redo: Redoes the last undone calculation
+Save: Saves your calculation history to file
+Undo: Undoes the most recent calculation
 ```
 
-New to v.1.5, the 'undo' and 'redo' commands walk backwards and forward through the operation history
+The above text is generated by the Help command, along with the summary text for Arithmetic Operations from the previous section
+
+---
+
+The Clear, History, Undo, Redo, Save, and Load operations manage the calculator's operation history. See the below output:
 
 ```bash
->>$: add
-Enter operands for command 'add', or 'cancel' to abort:
->> operandx: 8
->> operandy: 6
+>>[0]$: 8 + 6
 Result: 14
->>$: undo
+>>[14]$: 6 * 8
+Result: 48
+>>[48]$: save
+Save Successful
+>>[48]$: undo
 Undo successful
->>$: history
-No history to display
->>$: redo
-Redo successful
->>$: history
+>>[14]$: history
 Calculation History
 -------------------
 1. Addition(8, 6) = 14
->>$:
-```
 
-v.1.5's 'save' and 'load' commands record and retrieve your operation history from disk, 
-and it's 'clear' command wipes system's history and undo/redo stacks.
+>>[14]$: redo
+Redo successful
+>>[48]$: history
+Calculation History
+-------------------
+1. Addition(8, 6) = 14
+2. Multiplication(6, 8) = 48
 
-```bash
->>$: clear
+>>[48]$: clear
 History cleared
->>$: undo
-Nothing to undo
->>$:
+>>[0]$: load
+Load Successful
+>>[48]$: history
+Calculation History
+-------------------
+1. Addition(8, 6) = 14
+2. Multiplication(6, 8) = 48
+
+>>[48]$:
 ```
 
-To exit the program, use the command `exit`. By default, the system will save your current history.
+Note that, as of v.1.6, History items loaded from file are not available for the undo function.
+
+Finally, the exit command saves the current history state and exits the program:
 
 ```bash
->>$: exit
-History saved successfully.
+>>[0]$: exit
+History Saved Successfully
+
 Thank you for using Python REPL Calculator. Exiting...
 ```
 
